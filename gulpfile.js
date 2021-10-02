@@ -42,7 +42,17 @@ function images() {
 	.pipe(dest('dist/images/'))
 }
 
+function build() {
+    return src([
+        'app/css/style.min.css',
+        'app/fonts/**/*',
+        'app/js/main.min.js',
+        'app/*.html'
+    ], {base: 'app'})
+        .pipe(dest('dist'))
+}
 
 exports.styles = styles;
 exports.scripts = scripts;
 exports.images = images;
+exports.build = build;
