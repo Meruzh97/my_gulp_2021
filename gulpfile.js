@@ -5,6 +5,17 @@ const autoprefixer = require('gulp-autoprefixer');
 const concat       = require('gulp-concat');
 const uglify       = require('gulp-uglify-es').default;
 const image        = require('gulp-image');
+const browserSync  = require('browser-sync').create();
+
+function browsersync() {
+    browserSync.init({
+        server: {
+            baseDir: "./",
+            directory: true,
+            index: "index.html"
+        }
+    });
+};
 
 function styles() {
     return src('app/scss/style.scss')
@@ -14,6 +25,7 @@ function styles() {
         cascade: false
     }))
     .pipe(dest('app/css'))
+    .pipe(browserSync.stream())
 }
 
 function scripts() {
@@ -24,6 +36,7 @@ function scripts() {
     .pipe(uglify())
     .pipe(concat('main.min.js'))
     .pipe(dest('app/js/'))
+    .pipe(browserSync.stream())
 }
 
 function images() {
@@ -52,7 +65,17 @@ function build() {
         .pipe(dest('dist'))
 }
 
+function watching() {
+    watch(['app/scss/**/*.scss'], styles);
+    watch(['app/js/**/*.js', '!app/js/main.min.js'], scripts);
+    watch(['app/**/*.html']).on('change', browserSync.reload)
+}
+
 exports.styles = styles;
 exports.scripts = scripts;
 exports.images = images;
 exports.build = build;
+exports.browsersync = browsersync;
+exports.watching = watching;
+
+exports.default = parallel(scripts, browsersync, watching, styles);
